@@ -1,4 +1,5 @@
-Arduino Nintendo Library 1.2.1
+Arduino Nintendo Library 1.2.1-rawfetch
+
 ==============================
 
 ![header](header.jpg)
@@ -6,6 +7,9 @@ Arduino Nintendo Library 1.2.1
 This library is made to connect Nintendo Controllers to your Arduino very easy.
 Make sure you grab the right hardware, tear off some cables to use your controllers
 on your PC for example. The requirement are written in each library readme part.
+
+This is a fork of Nicohood's project which allows for reading of a spliced data line without writing.
+This is useful if you want to read data going between the controller and the console without manipulating it. This is the only change made to it, all other functionality is still available as-is. 
 
 **IDE 1.6 compatible!**
 
