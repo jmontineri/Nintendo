@@ -78,6 +78,8 @@ extern "C" {
 uint8_t gc_n64_send_get(const uint8_t pin, uint8_t* command, const uint8_t commandLen,
     uint8_t* report, const uint8_t reportLen) __attribute__((noinline));
 
+uint8_t gc_n64_receive_raw(const uint8_t pin, uint8_t* buf_cons, const uint8_t len_cons, uint8_t* buf_ctrl, const uint8_t len_ctrl) __attribute__((noinline));
+
 void gc_n64_send(const uint8_t* buff, uint8_t len,
     volatile uint8_t* modePort, volatile uint8_t* outPort, uint8_t bitMask)
     __attribute__((noinline));

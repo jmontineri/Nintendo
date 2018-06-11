@@ -53,6 +53,30 @@ uint8_t gc_n64_send_get(const uint8_t pin, uint8_t* command, const uint8_t comma
     return receivedBytes;
 }
 
+uint8_t gc_n64_receive_raw(const uint8_t pin, uint8_t* buf_cons, const uint8_t len_cons, uint8_t* buf_ctrl, const uint8_t len_ctrl){
+    // get the port mask and the pointers to the in/out/mode registers
+    uint8_t bitMask = digitalPinToBitMask(pin);
+    uint8_t port = digitalPinToPort(pin);
+    volatile uint8_t* modePort = portModeRegister(port);
+    volatile uint8_t* outPort = portOutputRegister(port);
+    volatile uint8_t* inPort = portInputRegister(port);
+
+    // don't want interrupts getting in the way
+    uint8_t oldSREG = SREG;
+    cli();
+
+    // read in data from console
+    uint8_t receivedBytes = gc_n64_get(buf_cons, len_cons, modePort, outPort, inPort, bitMask);
+    delayMicroseconds(5); //magic value - controller packets are consistently offset by one bit if this delay is not present
+    receivedBytes += gc_n64_get(buf_ctrl, len_ctrl, modePort, outPort, inPort, bitMask);
+
+    // end of time sensitive code
+    SREG = oldSREG;
+
+    // return received length
+    return receivedBytes;
+}
+
 
 // nop definitions, placed here so the header/user
 // doesnt see/use this because it is %[nop] specific
@@ -166,7 +190,8 @@ Serial.println(n % 3);
 #define nopn96 nopn0
 #define nopn97 nopn1
 #define nopn98 nopn2
-#define nopn99 nopn0
+#define nopn99 nopn0
+
 #define nop_reg "%[nop]" // in this sketch we named the register like this
 #define nop_block(id, N) /* nops have to be >=3 in order to work*/ \
 "ldi " nop_reg ", (" #N "/3)\n" /* (1) ldi, start */ \
@@ -303,7 +328,6 @@ void gc_n64_send(const uint8_t* buff, uint8_t len,
         // no clobbers
         ); // end of asm volatile
 }
-
 
 /**
 * Read bytes from the gamecube controller
